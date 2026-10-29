@@ -32,6 +32,8 @@ climate:
     humidity_sensor: sensor.xxxxx        # optionnel
     # temperature_sensor: sensor.xxxxx   # optionnel, sinon current_temperature de Tuya
     # sync_delay: 8                      # optionnel, secondes
+    # fan_mode_map:                      # optionnel, valeur Tuya -> valeur du fichier IR
+    #   medium: high
 ```
 
 ## Fonctionnement
@@ -43,6 +45,7 @@ climate:
 | `current_temperature` | `temperature_sensor` si défini, sinon `tuya_entity` |
 | `current_humidity` | `humidity_sensor` si défini |
 
+- `fan_mode_map` permet de forcer une correspondance (ex. Tuya remonte `medium` quand on envoie `high`).
 - Les valeurs Tuya sont converties vers le vocabulaire du fichier IR (`medium` → `mid`, `strong` → `high`…).
 - Aucun code IR n'est jamais envoyé à cause d'un changement d'état Tuya (pas de boucle).
 - Après un ordre IR, les retours Tuya sont ignorés pendant `sync_delay` secondes (le temps que

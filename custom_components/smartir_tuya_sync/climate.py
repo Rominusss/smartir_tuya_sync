@@ -38,6 +38,7 @@ _LOGGER = logging.getLogger(__name__)
 DEFAULT_NAME = "SmartIR Tuya Sync Climate"
 CONF_TUYA_ENTITY = "tuya_entity"
 CONF_SYNC_DELAY = "sync_delay"
+CONF_FAN_MODE_MAP = "fan_mode_map"
 DEFAULT_SYNC_DELAY = 8.0
 
 PLATFORM_SCHEMA = CLIMATE_PLATFORM_SCHEMA.extend(
@@ -51,6 +52,7 @@ PLATFORM_SCHEMA = CLIMATE_PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_TEMPERATURE_SENSOR): cv.entity_id,
         vol.Optional(CONF_HUMIDITY_SENSOR): cv.entity_id,
         vol.Optional(CONF_SYNC_DELAY, default=DEFAULT_SYNC_DELAY): cv.positive_float,
+        vol.Optional(CONF_FAN_MODE_MAP, default={}): vol.Schema({cv.string: cv.string}),
     }
 )
 
@@ -114,6 +116,10 @@ class SmartIRTuyaSyncClimate(SmartIRClimate):
         super().__init__(hass, config, device_data)
         self._tuya_entity = config[CONF_TUYA_ENTITY]
         self._sync_delay = config[CONF_SYNC_DELAY]
+        # Explicit Tuya fan value -> IR fan value overrides (e.g. {"medium": "high"}).
+        self._fan_map = {
+            str(k).lower(): str(v) for k, v in config[CONF_FAN_MODE_MAP].items()
+        }
         # No dedicated temperature sensor configured -> use the Tuya one.
         self._use_tuya_temp = not self._temperature_sensor
         self._ignore_until = 0.0
@@ -217,7 +223,10 @@ class SmartIRTuyaSyncClimate(SmartIRClimate):
             )
 
         # fan mode
-        fan = self._match(attrs.get("fan_mode"), self._fan_modes)
+        raw_fan = attrs.get("fan_mode")
+        if raw_fan is not None:
+            raw_fan = self._fan_map.get(str(raw_fan).lower(), raw_fan)
+        fan = self._match(raw_fan, self._fan_modes)
         if fan is not None:
             self._current_fan_mode = fan
 
