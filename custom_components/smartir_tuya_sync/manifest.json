@@ -1,0 +1,11 @@
+{
+  "domain": "smartir_tuya_sync",
+  "name": "SmartIR Tuya Sync",
+  "codeowners": [],
+  "dependencies": ["smartir"],
+  "documentation": "https://github.com/VOTRE_USER/smartir_tuya_sync",
+  "issue_tracker": "https://github.com/VOTRE_USER/smartir_tuya_sync/issues",
+  "iot_class": "local_push",
+  "requirements": [],
+  "version": "1.0.0"
+}
